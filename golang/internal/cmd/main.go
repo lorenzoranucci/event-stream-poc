@@ -17,7 +17,7 @@ func GetApp(version string) *cli.App {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "kafka-url",
-			EnvVar: "PPRO_KAFKA_URL",
+			EnvVar: "KAFKA_URL",
 			Usage:  "Kafka url",
 		},
 	}

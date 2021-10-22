@@ -16,3 +16,15 @@ type Review struct {
 	comment string
 	rating  int
 }
+
+func (r *Review) Uuid() uuid.UUID {
+	return r.uuid
+}
+
+func (r *Review) Comment() string {
+	return r.comment
+}
+
+func (r *Review) Rating() int {
+	return r.rating
+}
