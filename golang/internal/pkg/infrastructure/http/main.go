@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ProntoPro/golang-kafka/internal/pkg/infrastructure/http/create_review"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/create_review"
 )
 
 type Server struct {

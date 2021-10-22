@@ -2,7 +2,7 @@ APP_VERSION ?= dev
 KUBEVAL_ARCH ?= darwin-amd64
 
 _GOLANG_IMAGE = prontopro/golang:1.16.7-1-dev
-_PROJECT_NAME = golang-kafka
+_PROJECT_NAME = event-stream-golang
 _PROJECT_DIR = $(patsubst %/,%,$(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 _PROJECT_PREFIX = github.com/ProntoPro
 

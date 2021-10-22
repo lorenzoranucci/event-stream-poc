@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"github.com/ProntoPro/golang-kafka/internal/pkg/application"
-	"github.com/ProntoPro/golang-kafka/internal/pkg/infrastructure/http"
-	"github.com/ProntoPro/golang-kafka/internal/pkg/infrastructure/http/create_review"
-	"github.com/ProntoPro/golang-kafka/internal/pkg/infrastructure/in_memory"
-	"github.com/ProntoPro/golang-kafka/internal/pkg/infrastructure/kafka"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/create_review"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/in_memory"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/kafka"
 	"github.com/urfave/cli"
 )
 

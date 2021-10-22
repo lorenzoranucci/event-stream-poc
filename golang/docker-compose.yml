@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  golang-kafka:
-    container_name: pp_golang_kafka
+  event-stream-golang:
+    container_name: pp_event_stream_golang
     image: prontopro/golang:1.16.7-1-dev
     env_file: ./.env.dist
-    command: go run cmd/golang-kafka/main.go server
+    command: go run cmd/event-stream-golang/main.go server
     working_dir: /srv
     volumes:
       - ./:/srv:cached

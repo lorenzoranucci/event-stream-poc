@@ -9,7 +9,7 @@ func GetApp(version string) *cli.App {
 
 	app.Version = version
 
-	app.Name = "ProntoPro golang-kafka poc"
+	app.Name = "ProntoPro event-stream-golang poc"
 	app.Usage = ""
 
 	app.HideVersion = true

@@ -1,4 +1,4 @@
-module github.com/ProntoPro/golang-kafka
+module github.com/ProntoPro/event-stream-golang
 
 go 1.17
 

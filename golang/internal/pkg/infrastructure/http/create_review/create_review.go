@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ProntoPro/golang-kafka/internal/pkg/application"
-	http2 "github.com/ProntoPro/golang-kafka/internal/pkg/infrastructure/http/utils"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
+	http2 "github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/utils"
 )
 
 type CreateReviewHandler struct {

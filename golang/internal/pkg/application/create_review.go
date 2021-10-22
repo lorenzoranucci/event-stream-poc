@@ -1,7 +1,7 @@
 package application
 
 import (
-	"github.com/ProntoPro/golang-kafka/internal/pkg/domain"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/domain"
 )
 
 type CreateReviewCommandHandler struct {

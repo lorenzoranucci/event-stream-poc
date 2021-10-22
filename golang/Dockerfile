@@ -5,8 +5,8 @@ RUN apk --update add ca-certificates
 FROM scratch
 
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY ./bin/golang-kafka /bin/golang-kafka
+COPY ./bin/event-stream-golang /bin/event-stream-golang
 
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/golang-kafka"]
+ENTRYPOINT ["/bin/event-stream-golang"]

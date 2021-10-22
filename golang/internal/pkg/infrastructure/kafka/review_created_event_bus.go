@@ -1,7 +1,7 @@
 package kafka
 
 import (
-	"github.com/ProntoPro/golang-kafka/internal/pkg/application"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
 )
 
 type ReviewCreatedEventBus struct {

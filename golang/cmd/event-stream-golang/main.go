@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ProntoPro/golang-kafka/internal/cmd"
+	"github.com/ProntoPro/event-stream-golang/internal/cmd"
 )
 
 var (

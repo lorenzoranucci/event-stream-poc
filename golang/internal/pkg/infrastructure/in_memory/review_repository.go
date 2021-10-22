@@ -1,7 +1,7 @@
 package in_memory
 
 import (
-	"github.com/ProntoPro/golang-kafka/internal/pkg/domain"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/domain"
 )
 
 type ReviewRepository struct {
