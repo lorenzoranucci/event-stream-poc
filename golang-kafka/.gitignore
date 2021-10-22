@@ -1,0 +1,6 @@
+/bin
+/vendor
+/.ci-gopath
+/build/*
+!/build/.gitkeep
+.env
