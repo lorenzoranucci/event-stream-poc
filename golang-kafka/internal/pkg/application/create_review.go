@@ -9,13 +9,17 @@ type CreateReviewCommandHandler struct {
 	eventBus          EventBus
 }
 
+func NewCreateReviewCommandHandler(reviewRepository ReviewRepository, eventBus EventBus) *CreateReviewCommandHandler {
+	return &CreateReviewCommandHandler{reviewRepository: reviewRepository, eventBus: eventBus}
+}
+
 type CreateReviewCommand struct {
 	Comment string
 	Rating int
 }
 
 type ReviewRepository interface {
-	Add(tu *domain.Review) error
+	Add(review *domain.Review) error
 }
 
 type EventBus interface {
