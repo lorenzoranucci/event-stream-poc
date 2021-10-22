@@ -37,6 +37,3 @@ volumes:
     driver: local
   kafka_data:
     driver: local
-
-
-

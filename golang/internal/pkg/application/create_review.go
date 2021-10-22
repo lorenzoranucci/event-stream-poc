@@ -6,7 +6,7 @@ import (
 
 type CreateReviewCommandHandler struct {
 	reviewRepository ReviewRepository
-	eventBus          EventBus
+	eventBus         EventBus
 }
 
 func NewCreateReviewCommandHandler(reviewRepository ReviewRepository, eventBus EventBus) *CreateReviewCommandHandler {
@@ -15,7 +15,7 @@ func NewCreateReviewCommandHandler(reviewRepository ReviewRepository, eventBus E
 
 type CreateReviewCommand struct {
 	Comment string
-	Rating int
+	Rating  int
 }
 
 type ReviewRepository interface {

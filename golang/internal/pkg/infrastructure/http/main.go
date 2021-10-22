@@ -8,8 +8,8 @@ import (
 )
 
 type Server struct {
-	m           *http.ServeMux
-	port        int
+	m    *http.ServeMux
+	port int
 }
 
 func NewServer(
@@ -17,7 +17,7 @@ func NewServer(
 	createReviewHandler *create_review.CreateReviewHandler,
 ) *Server {
 	srv := &Server{
-		m: http.NewServeMux(),
+		m:    http.NewServeMux(),
 		port: port,
 	}
 
