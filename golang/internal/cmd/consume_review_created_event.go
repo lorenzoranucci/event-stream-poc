@@ -13,17 +13,17 @@ func consumeReviewCreatedEvent(baseFlags []cli.Flag) cli.Command {
 	return cli.Command{
 		Name:   "consume-review-created",
 		Action: consumeReviewCreated,
-		Flags: baseFlags,
+		Flags:  baseFlags,
 	}
 }
 
 func consumeReviewCreated(c *cli.Context) error {
-	kafkaConsumer, err := kafka2.NewConsumer(c.String("kafka-url"), 0)
+	kafkaConsumer, err := kafka2.NewConsumer(c.String("kafka-url"), 0, "review_created_event")
 	if err != nil {
 		return err
 	}
 
-	consumer := kafka.NewReviewCreatedEventConsumer(kafkaConsumer)
+	consumer := kafka.NewReviewCreatedEventConsumer(kafkaConsumer, &kafka.ReviewCreatedEventJSONMarshaller{})
 
 	err = consumer.Consume()
 	if err != nil {

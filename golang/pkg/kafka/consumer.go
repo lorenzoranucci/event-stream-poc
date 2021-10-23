@@ -4,29 +4,30 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-func NewConsumer(broker string, readPartition int32) (*Consumer, error) {
+func NewConsumer(broker string, readPartition int32, topic string) (*Consumer, error) {
 	consumer, err := sarama.NewConsumer([]string{broker}, sarama.NewConfig())
 	if err != nil {
 		return nil, err
 	}
-	return &Consumer{consumer: consumer, readPartition: readPartition}, nil
+	return &Consumer{consumer: consumer, readPartition: readPartition, topic: topic}, nil
 }
 
 type Consumer struct {
 	consumer      sarama.Consumer
 	readPartition int32
+	topic         string
 }
 
-func (c *Consumer) ReadAllFromTopic(topic string) (<-chan []byte, error) {
-	return c.ReadTopicFromOffset(topic, sarama.OffsetOldest)
+func (c *Consumer) ConsumeAll() (<-chan []byte, error) {
+	return c.ConsumeFromOffset(sarama.OffsetOldest)
 }
 
-func (c *Consumer) ReadNewFromTopic(topic string) (<-chan []byte, error) {
-	return c.ReadTopicFromOffset(topic, sarama.OffsetNewest)
+func (c *Consumer) ConsumeNew() (<-chan []byte, error) {
+	return c.ConsumeFromOffset(sarama.OffsetNewest)
 }
 
-func (c *Consumer) ReadTopicFromOffset(topic string, offset int64) (<-chan []byte, error) {
-	partitionConsumer, err := c.consumer.ConsumePartition(topic, c.readPartition, offset)
+func (c *Consumer) ConsumeFromOffset(offset int64) (<-chan []byte, error) {
+	partitionConsumer, err := c.consumer.ConsumePartition(c.topic, c.readPartition, offset)
 	if err != nil {
 		return nil, err
 	}

@@ -1,34 +1,28 @@
 package kafka
 
 import (
-	"encoding/json"
-
 	"github.com/Shopify/sarama"
 )
 
-func NewProducer(broker string) (*Producer, error) {
+func NewProducer(broker string, topic string) (*Producer, error) {
 	syncProducer, err := newSyncProducer([]string{broker})
 	if err != nil {
 		return nil, err
 	}
 
-	return &Producer{syncProducer: syncProducer}, nil
+	return &Producer{syncProducer: syncProducer, topic: topic}, nil
 }
 
 type Producer struct {
 	syncProducer sarama.SyncProducer
+	topic        string
 }
 
-func (p *Producer) SendJSONSync(message interface{}, topic string) error {
-	marshalledMessage, err := json.Marshal(message)
-	if err != nil {
-		return err
-	}
-
-	_, _, err = p.syncProducer.SendMessage(
+func (p *Producer) Dispatch(message []byte) error {
+	_, _, err := p.syncProducer.SendMessage(
 		&sarama.ProducerMessage{
-			Topic: topic,
-			Value: sarama.StringEncoder(marshalledMessage),
+			Topic: p.topic,
+			Value: sarama.StringEncoder(message),
 		},
 	)
 

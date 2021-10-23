@@ -25,7 +25,7 @@ func NewCreateReviewHandler(
 
 type Request struct {
 	Comment string `json:"comment"`
-	Rating  int    `json:"rating"`
+	Rating  int32  `json:"rating"`
 }
 
 func (h *CreateReviewHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

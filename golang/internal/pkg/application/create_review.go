@@ -15,7 +15,7 @@ func NewCreateReviewCommandHandler(reviewRepository ReviewRepository, eventBus E
 
 type CreateReviewCommand struct {
 	Comment string
-	Rating  int
+	Rating  int32
 }
 
 type ReviewRepository interface {

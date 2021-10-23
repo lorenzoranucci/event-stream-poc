@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func NewReview(comment string, rating int) *Review {
+func NewReview(comment string, rating int32) *Review {
 	return &Review{
 		uuid:    uuid.New(),
 		comment: comment,
@@ -14,7 +14,7 @@ func NewReview(comment string, rating int) *Review {
 type Review struct {
 	uuid    uuid.UUID
 	comment string
-	rating  int
+	rating  int32
 }
 
 func (r *Review) Uuid() uuid.UUID {
@@ -25,6 +25,6 @@ func (r *Review) Comment() string {
 	return r.comment
 }
 
-func (r *Review) Rating() int {
+func (r *Review) Rating() int32 {
 	return r.rating
 }

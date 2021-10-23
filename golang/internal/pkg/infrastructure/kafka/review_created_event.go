@@ -7,5 +7,5 @@ type ReviewCreatedEventMessage struct {
 type ReviewMessage struct {
 	UUID    string `json:"uuid"`
 	Comment string `json:"comment"`
-	Rating  int    `json:"rating"`
+	Rating  int32  `json:"rating"`
 }

@@ -1,0 +1,12 @@
+syntax = "proto3";
+option go_package = "internal/pkg/infrastructure/kafka";
+
+message ReviewCreatedEvent {
+    message Review {
+        string uuid = 1;
+        string comment = 2;
+        int32 rating = 3;
+    }
+
+    Review review = 1;
+}

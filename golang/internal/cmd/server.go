@@ -29,7 +29,7 @@ func getServerCommand(baseFlags []cli.Flag) cli.Command {
 }
 
 func runServer(c *cli.Context) error {
-	kafkaProducer, err := kafka2.NewProducer(c.String("kafka-url"))
+	kafkaProducer, err := kafka2.NewProducer(c.String("kafka-url"), "review_created_event")
 	if err != nil {
 		return err
 	}
@@ -39,8 +39,9 @@ func runServer(c *cli.Context) error {
 		create_review.NewCreateReviewHandler(
 			application.NewCreateReviewCommandHandler(
 				&in_memory.ReviewRepository{},
-				kafka.NewReviewCreatedEventBus(
+				kafka.NewReviewCreatedEventProducer(
 					kafkaProducer,
+					&kafka.ReviewCreatedEventJSONMarshaller{},
 				),
 			),
 		),
