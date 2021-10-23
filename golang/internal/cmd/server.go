@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"github.com/urfave/cli"
+
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/create_review"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/in_memory"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/kafka"
 	kafka2 "github.com/ProntoPro/event-stream-golang/pkg/kafka"
-	"github.com/urfave/cli"
 )
 
 func getServerCommand(baseFlags []cli.Flag) cli.Command {
@@ -28,7 +29,7 @@ func getServerCommand(baseFlags []cli.Flag) cli.Command {
 }
 
 func runServer(c *cli.Context) error {
-	kafkaClient, err := kafka2.NewClient(c.String("kafka-url"))
+	kafkaProducer, err := kafka2.NewProducer(c.String("kafka-url"))
 	if err != nil {
 		return err
 	}
@@ -39,7 +40,7 @@ func runServer(c *cli.Context) error {
 			application.NewCreateReviewCommandHandler(
 				&in_memory.ReviewRepository{},
 				kafka.NewReviewCreatedEventBus(
-					kafkaClient,
+					kafkaProducer,
 				),
 			),
 		),

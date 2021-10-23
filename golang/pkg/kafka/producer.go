@@ -2,32 +2,30 @@ package kafka
 
 import (
 	"encoding/json"
-	"log"
-	"strings"
 
 	"github.com/Shopify/sarama"
 )
 
-func NewClient(broker string) (*Client, error) {
-	dataCollector, err := newDataCollector([]string{broker})
+func NewProducer(broker string) (*Producer, error) {
+	syncProducer, err := newSyncProducer([]string{broker})
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{SyncProducer: dataCollector}, nil
+	return &Producer{syncProducer: syncProducer}, nil
 }
 
-type Client struct {
-	SyncProducer sarama.SyncProducer
+type Producer struct {
+	syncProducer sarama.SyncProducer
 }
 
-func (c Client) SendJSONSync(message interface{}, topic string) error {
+func (p *Producer) SendJSONSync(message interface{}, topic string) error {
 	marshalledMessage, err := json.Marshal(message)
 	if err != nil {
 		return err
 	}
 
-	_, _, err = c.SyncProducer.SendMessage(
+	_, _, err = p.syncProducer.SendMessage(
 		&sarama.ProducerMessage{
 			Topic: topic,
 			Value: sarama.StringEncoder(marshalledMessage),
@@ -37,7 +35,7 @@ func (c Client) SendJSONSync(message interface{}, topic string) error {
 	return err
 }
 
-func newDataCollector(brokerList []string) (sarama.SyncProducer, error) {
+func newSyncProducer(brokerList []string) (sarama.SyncProducer, error) {
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll // Wait for all in-sync replicas to ack the message
 	config.Producer.Retry.Max = 10                   // Retry up to 10 times to produce the message
@@ -45,8 +43,12 @@ func newDataCollector(brokerList []string) (sarama.SyncProducer, error) {
 
 	producer, err := sarama.NewSyncProducer(brokerList, config)
 	if err != nil {
-		log.Fatalf("Failed to start Sarama producer on broker %s: %s\n", strings.Join(brokerList, ","), err)
+		return nil, err
 	}
 
 	return producer, err
+}
+
+func (p *Producer) Close() error {
+	return p.syncProducer.Close()
 }

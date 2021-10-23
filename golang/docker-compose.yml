@@ -11,6 +11,25 @@ services:
       - ./:/srv:cached
     ports:
       - "8080:8080"
+    deploy:
+      restart_policy:
+        condition: on-failure
+    networks:
+      ppro:
+
+  event-stream-golang-review-created-consumer:
+    container_name: pp_event_stream_golang_review_created_consumer
+    image: prontopro/golang:1.16.7-1-dev
+    env_file: ./.env.dist
+    command: go run cmd/event-stream-golang/main.go consume-review-created
+    working_dir: /srv
+    volumes:
+      - ./:/srv:cached
+    deploy:
+      restart_policy:
+        condition: on-failure
+    networks:
+      ppro:
 
   zookeeper:
     image: docker.io/bitnami/zookeeper:3.7
@@ -20,6 +39,11 @@ services:
       - "zookeeper_data:/bitnami"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+    deploy:
+      restart_policy:
+        condition: on-failure
+    networks:
+      ppro:
   kafka:
     image: docker.io/bitnami/kafka:3
     ports:
@@ -31,9 +55,18 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
+    deploy:
+      restart_policy:
+        condition: on-failure
+    networks:
+      ppro:
 
 volumes:
   zookeeper_data:
     driver: local
   kafka_data:
     driver: local
+
+networks:
+  ppro:
+    driver: "bridge"

@@ -24,6 +24,7 @@ func GetApp(version string) *cli.App {
 
 	app.Commands = []cli.Command{
 		getServerCommand(app.Flags),
+		consumeReviewCreatedEvent(app.Flags),
 	}
 
 	return app

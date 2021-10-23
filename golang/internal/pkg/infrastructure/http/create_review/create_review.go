@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
 	http2 "github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/utils"
 )
@@ -27,6 +29,8 @@ type Request struct {
 }
 
 func (h *CreateReviewHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("Processing request %#v", r)
+
 	if r.Method != "POST" {
 		http2.Fail(w, r, fmt.Errorf("only POST method is allowed"), http.StatusMethodNotAllowed)
 		return
@@ -45,6 +49,7 @@ func (h *CreateReviewHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		},
 	)
 	if err != nil {
+		logrus.Error(err)
 		http2.Fail(w, r, err, http.StatusInternalServerError)
 	}
 
