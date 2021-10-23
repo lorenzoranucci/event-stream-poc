@@ -4,9 +4,6 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli"
-
-	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/kafka"
-	kafka2 "github.com/ProntoPro/event-stream-golang/pkg/kafka"
 )
 
 func consumeReviewCreatedEvent(baseFlags []cli.Flag) cli.Command {
@@ -18,12 +15,21 @@ func consumeReviewCreatedEvent(baseFlags []cli.Flag) cli.Command {
 }
 
 func consumeReviewCreated(c *cli.Context) error {
-	kafkaConsumer, err := kafka2.NewConsumer(c.String("kafka-url"), 0, "review_created_event")
+	serviceLocator, err := NewServiceLocator(c.String("kafka-url"))
 	if err != nil {
 		return err
 	}
 
-	consumer := kafka.NewReviewCreatedEventConsumer(kafkaConsumer, &kafka.ReviewCreatedEventJSONMarshaller{})
+	useJSON := true
+	switch c.String("messaging-protocol") {
+	case "protobuf":
+		useJSON = false
+	}
+
+	consumer := serviceLocator.ReviewCreatedConsumerWithKafkaAndJSON()
+	if useJSON {
+		consumer = serviceLocator.ReviewCreatedConsumerWithKafkaAndProtobuf()
+	}
 
 	err = consumer.Consume()
 	if err != nil {

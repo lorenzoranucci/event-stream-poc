@@ -28,10 +28,11 @@ func (r *ReviewCreatedEventConsumer) Consume() error {
 	}
 
 	for message := range messages {
-		logrus.Info("processing message")
+		logrus.Infof("processing message %s", string(message))
 		eventMessage, err := r.reviewCreatedEventMarshaller.Unmarshal(message)
 		if err != nil {
-			return err
+			// todo handle error
+			logrus.Error(err)
 		}
 
 		logrus.Infof("processing review created event %#v", eventMessage)
