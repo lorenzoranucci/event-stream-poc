@@ -2,6 +2,11 @@
 
 ## Quick start 
 
+Fetch vendors:
+```shell
+make mod-vendor
+```
+
 Start the system:
 ```shell
 make run-system
@@ -17,4 +22,4 @@ Send reviews:
 make post-review
 ```
 
-Try to change the value of `MESSAGING_PROTOCOL` between `json` and `protobuf` MESSAGING_PROTOCOLin the `.env.dist` file.
+Try to change the value of `MESSAGING_PROTOCOL` between `json` and `protobuf` in the `.env.dist` file.
