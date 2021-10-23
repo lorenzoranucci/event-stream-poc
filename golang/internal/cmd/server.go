@@ -36,7 +36,7 @@ func runServer(c *cli.Context) error {
 	}
 
 	handler := serviceLocator.CreateReviewHandlerWithKafkaAndJSON()
-	if useJSON {
+	if !useJSON {
 		handler = serviceLocator.CreateReviewHandlerWithKafkaAndProtobuf()
 	}
 

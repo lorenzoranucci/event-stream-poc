@@ -27,7 +27,7 @@ func consumeReviewCreated(c *cli.Context) error {
 	}
 
 	consumer := serviceLocator.ReviewCreatedConsumerWithKafkaAndJSON()
-	if useJSON {
+	if !useJSON {
 		consumer = serviceLocator.ReviewCreatedConsumerWithKafkaAndProtobuf()
 	}
 

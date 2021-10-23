@@ -157,8 +157,19 @@ docker-image: build-docker
 .PHONY: run-server run-consumer-update-tags run-consumer-update run-consumer-delete
 .PHONY: run-consumer-sorting-scores run-consumer-sorting-default-scores run-consumer-sorting-geo-clusters
 
-run-server:
-	@go run cmd/${_PROJECT_NAME}/main.go server
+run-system:
+	@docker-compose down && docker-compose up -d
+
+post-review:
+	@curl -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/reviews \
+     -d '{"comment": "This is a comment", "rating": 10 }'
+
+log-consumer:
+	@docker logs -f pp_event_stream_golang_review_created_consumer
+
+log-server:
+	@docker logs -f pp_event_stream_golang_review_created_consumer
 
 # Utils
 
