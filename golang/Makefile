@@ -1,7 +1,7 @@
 APP_VERSION ?= dev
 KUBEVAL_ARCH ?= darwin-amd64
 
-_GOLANG_IMAGE = prontopro/golang:1.16.7-1-dev
+_GOLANG_IMAGE = golang:1.17.2
 _PROJECT_NAME = event-stream-golang
 _PROJECT_DIR = $(patsubst %/,%,$(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 _PROJECT_PREFIX = github.com/ProntoPro
@@ -35,7 +35,6 @@ endef
 
 env:
 	@grep -h -s -v '^#' ${_ENV_FILE} | sed 's/^/export /' | sed 's/=/="/' | sed 's/$$/"/'
-	@echo 'export GOPRIVATE=${_PROJECT_PREFIX}/gollum'
 	@echo '# run this command to configure your shell:'
 	@echo '# eval "$$(make env)"'
 
@@ -43,7 +42,6 @@ env-test:
 	@grep -h -s -v '^#' .env.test | sed 's/^/export /' | sed 's/=/="/' | sed 's/$$/"/'
 	@echo 'export CGO_ENABLED=0'
 	@echo 'export GOMAXPROCS=1'
-	@echo 'export GOPRIVATE=${_PROJECT_PREFIX}/gollum'
 	@echo '# run this command to configure your shell:'
 	@echo '# eval "$$(make env-test)"'
 
@@ -54,7 +52,6 @@ env-ci:
 	@echo 'export GOMAXPROCS=1'
 	@echo 'export GOMODCACHE="${_PROJECT_DIR}/.ci-gomodcache"'
 	@echo 'export GOOS=linux'
-	@echo 'export GOPRIVATE=${_PROJECT_PREFIX}/gollum'
 	@echo '# run this command to configure your shell:'
 	@echo '# eval "$$(make env-ci)"'
 

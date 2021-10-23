@@ -3,7 +3,7 @@ version: '3.8'
 services:
   event-stream-golang:
     container_name: pp_event_stream_golang
-    image: prontopro/golang:1.16.7-1-dev
+    image: golang:1.17.2
     env_file: ./.env.dist
     command: go run cmd/event-stream-golang/main.go server
     working_dir: /srv
@@ -19,7 +19,7 @@ services:
 
   event-stream-golang-review-created-consumer:
     container_name: pp_event_stream_golang_review_created_consumer
-    image: prontopro/golang:1.16.7-1-dev
+    image: golang:1.17.2
     env_file: ./.env.dist
     command: go run cmd/event-stream-golang/main.go consume-review-created
     working_dir: /srv
