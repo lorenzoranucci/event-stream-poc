@@ -4,6 +4,7 @@ import (
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/event_stream"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/create_review"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/get_reviews"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/in_memory"
 	"github.com/ProntoPro/event-stream-golang/pkg/kafka"
 	"github.com/ProntoPro/event-stream-golang/pkg/pulsar"
@@ -27,8 +28,10 @@ func newServiceLocator(kafkaURL string, pulsarURL string, eventStream string, fo
 
 type serviceLocator struct {
 	createReviewCommandHandler *application.CreateReviewCommandHandler
+	getReviewsQueryHandler     *application.GetReviewsQueryHandler
 
 	createReviewHandler  *create_review.CreateReviewHandler
+	getReviewsHandler    *get_reviews.GetReviewsHandler
 	createReviewConsumer event_stream.Consumer
 	createReviewProducer event_stream.Producer
 
@@ -39,7 +42,8 @@ type serviceLocator struct {
 	jsonMarshaller     *event_stream.ReviewCreatedEventJSONMarshaller
 	protobufMarshaller *event_stream.ReviewCreatedEventProtobufMarshaller
 
-	inMemoryReviewRepository *in_memory.ReviewRepository
+	inMemoryCreateReviewRepository *in_memory.CreateReviewRepository
+	inMemoryGetReviewsRepository   *in_memory.GetReviewsRepository
 
 	kafkaConsumer *kafka.Consumer
 	kafkaProducer *kafka.Producer
@@ -55,14 +59,26 @@ type serviceLocator struct {
 
 func (s *serviceLocator) CreateReviewCommandHandler() *application.CreateReviewCommandHandler {
 	if s.createReviewCommandHandler == nil {
-		s.createReviewCommandHandler = application.NewCreateReviewCommandHandler(s.ReviewRepository(), s.EventBus())
+		s.createReviewCommandHandler = application.NewCreateReviewCommandHandler(s.CreateReviewRepository(), s.EventBus())
 	}
 
 	return s.createReviewCommandHandler
 }
 
-func (s *serviceLocator) ReviewRepository() application.ReviewRepository {
+func (s *serviceLocator) GetReviewsQueryHandler() *application.GetReviewsQueryHandler {
+	if s.getReviewsQueryHandler == nil {
+		s.getReviewsQueryHandler = application.NewGetReviewsQueryHandler(s.GetReviewsRepository())
+	}
+
+	return s.getReviewsQueryHandler
+}
+
+func (s *serviceLocator) CreateReviewRepository() application.CreateReviewRepository {
 	return s.InMemoryReviewRepository()
+}
+
+func (s *serviceLocator) GetReviewsRepository() application.GetReviewsRepository {
+	return s.InMemoryGetReviewsRepository()
 }
 
 func (s *serviceLocator) EventBus() application.EventBus {
@@ -75,6 +91,14 @@ func (s *serviceLocator) CreateReviewHandler() *create_review.CreateReviewHandle
 	}
 
 	return s.createReviewHandler
+}
+
+func (s *serviceLocator) GetReviewsHandler() *get_reviews.GetReviewsHandler {
+	if s.getReviewsHandler == nil {
+		s.getReviewsHandler = get_reviews.NewGetReviewsHandler(s.GetReviewsQueryHandler())
+	}
+
+	return s.getReviewsHandler
 }
 
 func (s *serviceLocator) CreateReviewConsumer() event_stream.Consumer {
@@ -116,12 +140,20 @@ func (s *serviceLocator) ReviewCreatedMarshaller() event_stream.ReviewCreatedEve
 	return s.reviewCreatedMarshaller
 }
 
-func (s *serviceLocator) InMemoryReviewRepository() *in_memory.ReviewRepository {
-	if s.inMemoryReviewRepository == nil {
-		s.inMemoryReviewRepository = &in_memory.ReviewRepository{}
+func (s *serviceLocator) InMemoryReviewRepository() *in_memory.CreateReviewRepository {
+	if s.inMemoryCreateReviewRepository == nil {
+		s.inMemoryCreateReviewRepository = &in_memory.CreateReviewRepository{}
 	}
 
-	return s.inMemoryReviewRepository
+	return s.inMemoryCreateReviewRepository
+}
+
+func (s *serviceLocator) InMemoryGetReviewsRepository() *in_memory.GetReviewsRepository {
+	if s.inMemoryGetReviewsRepository == nil {
+		s.inMemoryGetReviewsRepository = &in_memory.GetReviewsRepository{}
+	}
+
+	return s.inMemoryGetReviewsRepository
 }
 
 func (s *serviceLocator) ReviewCreatedEventProducer() *event_stream.ReviewCreatedEventProducer {

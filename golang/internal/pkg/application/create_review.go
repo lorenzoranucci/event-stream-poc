@@ -5,11 +5,11 @@ import (
 )
 
 type CreateReviewCommandHandler struct {
-	reviewRepository ReviewRepository
+	reviewRepository CreateReviewRepository
 	eventBus         EventBus
 }
 
-func NewCreateReviewCommandHandler(reviewRepository ReviewRepository, eventBus EventBus) *CreateReviewCommandHandler {
+func NewCreateReviewCommandHandler(reviewRepository CreateReviewRepository, eventBus EventBus) *CreateReviewCommandHandler {
 	return &CreateReviewCommandHandler{reviewRepository: reviewRepository, eventBus: eventBus}
 }
 
@@ -18,7 +18,7 @@ type CreateReviewCommand struct {
 	Rating  int32
 }
 
-type ReviewRepository interface {
+type CreateReviewRepository interface {
 	Add(review *domain.Review) error
 }
 

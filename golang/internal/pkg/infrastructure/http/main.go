@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/create_review"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/get_reviews"
 )
 
 type Server struct {
@@ -15,13 +18,19 @@ type Server struct {
 func NewServer(
 	port int,
 	createReviewHandler *create_review.CreateReviewHandler,
+	getReviewsHandler *get_reviews.GetReviewsHandler,
 ) *Server {
+	r := mux.NewRouter()
+
+	r.Handle("/reviews", createReviewHandler).Methods("POST")
+	r.Handle("/reviews", getReviewsHandler).Methods("GET")
+
 	srv := &Server{
 		m:    http.NewServeMux(),
 		port: port,
 	}
 
-	srv.m.Handle("/reviews", createReviewHandler)
+	srv.m.Handle("/", r)
 
 	return srv
 }

@@ -29,6 +29,7 @@ func runServer(c *cli.Context) error {
 	server := http.NewServer(
 		c.Int("port"),
 		serviceLocator.CreateReviewHandler(),
+		serviceLocator.GetReviewsHandler(),
 	)
 
 	server.Run()

@@ -162,6 +162,10 @@ post-review:
      -X POST http://localhost:8080/reviews \
      -d '{"comment": "This is a comment", "rating": 10 }'
 
+get-reviews:
+	@curl -H "Content-Type: application/json" \
+     -X GET http://localhost:8080/reviews?limit=50&offset=0
+
 log-consumer:
 	@docker logs -f pp_event_stream_golang_review_created_consumer
 
