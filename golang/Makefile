@@ -168,6 +168,9 @@ log-consumer:
 log-server:
 	@docker logs -f pp_event_stream_golang_review_created_consumer
 
+log-system:
+	@docker-compose logs --tail=0 -f
+
 # Utils
 
 %-docker:

@@ -7,14 +7,20 @@ Fetch vendors:
 make mod-vendor
 ```
 
+Set envs:
+```shell
+cp .env.dist .env
+```
+_Optionally set "kafka" or "pulsar" as event stream and "json" or "protobuf" as format_.
+
 Start the system:
 ```shell
 make run-system
 ```
 
-Watch the consumer:
+Watch the logs:
 ```shell
-make log-consumer
+make log-system
 ```
 
 Send reviews:

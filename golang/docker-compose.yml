@@ -4,7 +4,9 @@ services:
   event-stream-golang:
     container_name: pp_event_stream_golang
     image: golang:1.17.2
-    env_file: ./.env.dist
+    env_file:
+      - ./.env
+      - ./.env.dist
     command: go run cmd/event-stream-golang/main.go server
     working_dir: /srv
     volumes:
@@ -20,7 +22,9 @@ services:
   event-stream-golang-review-created-consumer:
     container_name: pp_event_stream_golang_review_created_consumer
     image: golang:1.17.2
-    env_file: ./.env.dist
+    env_file:
+      - ./.env
+      - ./.env.dist
     command: go run cmd/event-stream-golang/main.go consume-review-created
     working_dir: /srv
     volumes:
