@@ -15,23 +15,11 @@ func consumeReviewCreatedEvent(baseFlags []cli.Flag) cli.Command {
 }
 
 func consumeReviewCreated(c *cli.Context) error {
-	serviceLocator, err := NewServiceLocator(c.String("kafka-url"))
-	if err != nil {
-		return err
-	}
+	serviceLocator := newServiceLocatorFromCliContext(c)
 
-	useJSON := true
-	switch c.String("messaging-protocol") {
-	case "protobuf":
-		useJSON = false
-	}
+	consumer := serviceLocator.ReviewCreatedEventConsumer()
 
-	consumer := serviceLocator.ReviewCreatedConsumerWithKafkaAndJSON()
-	if !useJSON {
-		consumer = serviceLocator.ReviewCreatedConsumerWithKafkaAndProtobuf()
-	}
-
-	err = consumer.Consume()
+	err := consumer.Consume()
 	if err != nil {
 		fmt.Println(err)
 	}

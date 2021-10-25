@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.26.0
 // 	protoc        v3.6.1
-// source: internal/pkg/infrastructure/kafka/review_created_event.proto
+// source: internal/pkg/infrastructure/event_stream/review_created_event.proto
 
-package kafka
+package event_stream
 
 import (
 	reflect "reflect"

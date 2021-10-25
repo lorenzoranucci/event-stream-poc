@@ -1,4 +1,4 @@
-package kafka
+package event_stream
 
 type ReviewCreatedEventMessage struct {
 	Review ReviewMessage `json:"review"`

@@ -8,7 +8,7 @@ func NewReview(comment string, rating int32) *Review {
 	return &Review{
 		uuid:    uuid.New(),
 		comment: comment,
-		rating: rating,
+		rating:  rating,
 	}
 }
 

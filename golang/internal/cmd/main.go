@@ -16,12 +16,20 @@ func GetApp(version string) *cli.App {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "kafka-url",
+			Name:   "event_stream-url",
 			EnvVar: "KAFKA_URL",
+		},
+		cli.StringFlag{
+			Name:   "pulsar-url",
+			EnvVar: "PULSAR_URL",
 		},
 		cli.StringFlag{
 			Name:   "messaging-protocol",
 			EnvVar: "MESSAGING_PROTOCOL",
+		},
+		cli.StringFlag{
+			Name:   "event-stream-type",
+			EnvVar: "EVENT_STREAM_TYPE",
 		},
 	}
 
@@ -31,4 +39,13 @@ func GetApp(version string) *cli.App {
 	}
 
 	return app
+}
+
+func newServiceLocatorFromCliContext(c *cli.Context) *serviceLocator {
+	return newServiceLocator(
+		c.String("kafka-url"),
+		c.String("pulsar-url"),
+		c.String("event-stream-type"),
+		c.String("messaging-protocol"),
+	)
 }

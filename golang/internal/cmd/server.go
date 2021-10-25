@@ -24,25 +24,11 @@ func getServerCommand(baseFlags []cli.Flag) cli.Command {
 }
 
 func runServer(c *cli.Context) error {
-	serviceLocator, err := NewServiceLocator(c.String("kafka-url"))
-	if err != nil {
-		return err
-	}
-
-	useJSON := true
-	switch c.String("messaging-protocol") {
-	case "protobuf":
-		useJSON = false
-	}
-
-	handler := serviceLocator.CreateReviewHandlerWithKafkaAndJSON()
-	if !useJSON {
-		handler = serviceLocator.CreateReviewHandlerWithKafkaAndProtobuf()
-	}
+	serviceLocator := newServiceLocatorFromCliContext(c)
 
 	server := http.NewServer(
 		c.Int("port"),
-		handler,
+		serviceLocator.CreateReviewHandler(),
 	)
 
 	server.Run()

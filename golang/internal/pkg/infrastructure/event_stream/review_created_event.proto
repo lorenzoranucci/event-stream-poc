@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "internal/pkg/infrastructure/kafka";
+option go_package = "internal/pkg/infrastructure/event_stream";
 
 message ReviewCreatedEvent {
     message Review {

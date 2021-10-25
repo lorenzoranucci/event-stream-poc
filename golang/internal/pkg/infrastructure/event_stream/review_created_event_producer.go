@@ -1,4 +1,4 @@
-package kafka
+package event_stream
 
 import (
 	"github.com/sirupsen/logrus"
@@ -7,17 +7,17 @@ import (
 )
 
 func NewReviewCreatedEventProducer(
-	kafkaProducer Producer,
+	producer Producer,
 	reviewCreatedEventMarshaller ReviewCreatedEventMarshaller,
 ) *ReviewCreatedEventProducer {
 	return &ReviewCreatedEventProducer{
-		kafkaProducer:                kafkaProducer,
+		producer:                     producer,
 		reviewCreatedEventMarshaller: reviewCreatedEventMarshaller,
 	}
 }
 
 type ReviewCreatedEventProducer struct {
-	kafkaProducer                Producer
+	producer                     Producer
 	reviewCreatedEventMarshaller ReviewCreatedEventMarshaller
 }
 
@@ -36,7 +36,7 @@ func (r *ReviewCreatedEventProducer) DispatchEvent(event application.ReviewCreat
 		r.handleErrors(err)
 	}
 
-	err = r.kafkaProducer.Dispatch(
+	err = r.producer.Dispatch(
 		messageData,
 	)
 
@@ -47,5 +47,5 @@ func (r *ReviewCreatedEventProducer) DispatchEvent(event application.ReviewCreat
 
 func (r ReviewCreatedEventProducer) handleErrors(err error) {
 	// todo handle error so to avoid losing events
-	logrus.Errorf("error sending review created message via Kafka: %s\n", err.Error())
+	logrus.Errorf("error sending review created message via event stream: %s\n", err.Error())
 }

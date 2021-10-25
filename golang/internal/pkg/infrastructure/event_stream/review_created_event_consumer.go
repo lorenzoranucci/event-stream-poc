@@ -1,26 +1,26 @@
-package kafka
+package event_stream
 
 import (
 	"github.com/sirupsen/logrus"
 )
 
 func NewReviewCreatedEventConsumer(
-	kafkaClient Consumer,
+	consumer Consumer,
 	reviewCreatedEventMarshaller ReviewCreatedEventMarshaller,
 ) *ReviewCreatedEventConsumer {
 	return &ReviewCreatedEventConsumer{
-		kafkaClient:                  kafkaClient,
+		consumer:                     consumer,
 		reviewCreatedEventMarshaller: reviewCreatedEventMarshaller,
 	}
 }
 
 type ReviewCreatedEventConsumer struct {
-	kafkaClient                  Consumer
+	consumer                     Consumer
 	reviewCreatedEventMarshaller ReviewCreatedEventMarshaller
 }
 
 func (r *ReviewCreatedEventConsumer) Consume() error {
-	messages, err := r.kafkaClient.ConsumeAll()
+	messages, err := r.consumer.ConsumeAll()
 
 	if err != nil {
 		logrus.Error(err)

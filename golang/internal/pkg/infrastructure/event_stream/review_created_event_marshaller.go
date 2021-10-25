@@ -1,4 +1,4 @@
-package kafka
+package event_stream
 
 import (
 	"encoding/json"
