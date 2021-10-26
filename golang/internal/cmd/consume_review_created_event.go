@@ -17,6 +17,9 @@ func consumeReviewCreatedEvent(baseFlags []cli.Flag) cli.Command {
 func consumeReviewCreated(c *cli.Context) error {
 	serviceLocator := newServiceLocatorFromCliContext(c)
 
+	migrate := Migrate{db: serviceLocator.MysqlDB()}
+	migrate.Migrate()
+
 	consumer := serviceLocator.ReviewCreatedEventConsumer()
 
 	err := consumer.Consume()

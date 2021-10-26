@@ -26,6 +26,9 @@ func getServerCommand(baseFlags []cli.Flag) cli.Command {
 func runServer(c *cli.Context) error {
 	serviceLocator := newServiceLocatorFromCliContext(c)
 
+	migrate := Migrate{db: serviceLocator.MysqlDB()}
+	migrate.Migrate()
+
 	server := http.NewServer(
 		c.Int("port"),
 		serviceLocator.CreateReviewHandler(),

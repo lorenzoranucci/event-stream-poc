@@ -1,7 +1,5 @@
 package application
 
-import "github.com/ProntoPro/event-stream-golang/internal/pkg/domain"
-
 type GetReviewsQueryHandler struct {
 	reviewRepository GetReviewsRepository
 }
@@ -15,10 +13,16 @@ type GetReviewsQuery struct {
 	Offset int64
 }
 
-type GetReviewsRepository interface {
-	Find(query GetReviewsQuery) ([]domain.Review, error)
+type Review struct {
+	UUID    string
+	Comment string
+	Rating  int32
 }
 
-func (h *GetReviewsQueryHandler) Execute(query GetReviewsQuery) ([]domain.Review, error) {
+type GetReviewsRepository interface {
+	Find(query GetReviewsQuery) ([]Review, error)
+}
+
+func (h *GetReviewsQueryHandler) Execute(query GetReviewsQuery) ([]Review, error) {
 	return h.reviewRepository.Find(query)
 }

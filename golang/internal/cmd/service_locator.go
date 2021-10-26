@@ -1,11 +1,16 @@
 package cmd
 
 import (
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/event_stream"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/create_review"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/get_reviews"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/in_memory"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/mysql"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/projectors"
 	"github.com/ProntoPro/event-stream-golang/pkg/kafka"
 	"github.com/ProntoPro/event-stream-golang/pkg/pulsar"
 )
@@ -17,10 +22,17 @@ const (
 	ProtobufFormat    = "protobuf"
 )
 
-func newServiceLocator(kafkaURL string, pulsarURL string, eventStream string, format string) *serviceLocator {
+func newServiceLocator(
+	kafkaURL string,
+	pulsarURL string,
+	mysqlURL string,
+	eventStream string,
+	format string,
+) *serviceLocator {
 	return &serviceLocator{
 		kafkaURL:        kafkaURL,
 		pulsarURL:       pulsarURL,
+		mysqlURL:        mysqlURL,
 		eventStreamKind: eventStream,
 		format:          format,
 	}
@@ -45,16 +57,45 @@ type serviceLocator struct {
 	inMemoryCreateReviewRepository *in_memory.CreateReviewRepository
 	inMemoryGetReviewsRepository   *in_memory.GetReviewsRepository
 
+	mysqlCreateReviewRepository *mysql.CreateReviewRepository
+	mysqlGetReviewsRepository   *mysql.GetReviewsRepository
+
+	getReviewsProjector *projectors.GetReviewsProjector
+
 	kafkaConsumer *kafka.Consumer
 	kafkaProducer *kafka.Producer
 
 	pulsarConsumer *pulsar.Consumer
 	pulsarProducer *pulsar.Producer
 
+	mysqlDB *sqlx.DB
+
 	kafkaURL        string
 	pulsarURL       string
+	mysqlURL        string
 	eventStreamKind string
 	format          string
+}
+
+func (s *serviceLocator) MysqlCreateReviewRepository() *mysql.CreateReviewRepository {
+	if s.mysqlCreateReviewRepository == nil {
+		s.mysqlCreateReviewRepository = mysql.NewCreateReviewRepository(s.MysqlDB())
+	}
+	return s.mysqlCreateReviewRepository
+}
+
+func (s *serviceLocator) MysqlGetReviewsRepository() *mysql.GetReviewsRepository {
+	if s.mysqlGetReviewsRepository == nil {
+		s.mysqlGetReviewsRepository = mysql.NewGetReviewsRepository(s.MysqlDB())
+	}
+	return s.mysqlGetReviewsRepository
+}
+
+func (s *serviceLocator) GetReviewsProjector() *projectors.GetReviewsProjector {
+	if s.getReviewsProjector == nil {
+		s.getReviewsProjector = projectors.NewGetReviewsProjector(s.MysqlGetReviewsRepository())
+	}
+	return s.getReviewsProjector
 }
 
 func (s *serviceLocator) CreateReviewCommandHandler() *application.CreateReviewCommandHandler {
@@ -74,11 +115,11 @@ func (s *serviceLocator) GetReviewsQueryHandler() *application.GetReviewsQueryHa
 }
 
 func (s *serviceLocator) CreateReviewRepository() application.CreateReviewRepository {
-	return s.InMemoryReviewRepository()
+	return s.MysqlCreateReviewRepository()
 }
 
 func (s *serviceLocator) GetReviewsRepository() application.GetReviewsRepository {
-	return s.InMemoryGetReviewsRepository()
+	return s.MysqlGetReviewsRepository()
 }
 
 func (s *serviceLocator) EventBus() application.EventBus {
@@ -140,7 +181,7 @@ func (s *serviceLocator) ReviewCreatedMarshaller() event_stream.ReviewCreatedEve
 	return s.reviewCreatedMarshaller
 }
 
-func (s *serviceLocator) InMemoryReviewRepository() *in_memory.CreateReviewRepository {
+func (s *serviceLocator) InMemoryCreateReviewRepository() *in_memory.CreateReviewRepository {
 	if s.inMemoryCreateReviewRepository == nil {
 		s.inMemoryCreateReviewRepository = &in_memory.CreateReviewRepository{}
 	}
@@ -172,6 +213,7 @@ func (s *serviceLocator) ReviewCreatedEventConsumer() *event_stream.ReviewCreate
 		s.reviewCreatedEventConsumer = event_stream.NewReviewCreatedEventConsumer(
 			s.CreateReviewConsumer(),
 			s.ReviewCreatedMarshaller(),
+			s.GetReviewsProjector(),
 		)
 	}
 
@@ -236,6 +278,21 @@ func (s *serviceLocator) ProtobufMarshaller() *event_stream.ReviewCreatedEventPr
 	}
 
 	return s.protobufMarshaller
+}
+
+func (s *serviceLocator) MysqlDB() *sqlx.DB {
+	if s.mysqlDB == nil {
+		var err error
+		s.mysqlDB, err = sqlx.Connect("mysql", s.MysqlURL())
+		if err != nil {
+			panic(err)
+		}
+	}
+	return s.mysqlDB
+}
+
+func (s *serviceLocator) MysqlURL() string {
+	return s.mysqlURL
 }
 
 func (s *serviceLocator) KafkaURL() string {

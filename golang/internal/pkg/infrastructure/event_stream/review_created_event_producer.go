@@ -25,9 +25,9 @@ func (r *ReviewCreatedEventProducer) DispatchEvent(event application.ReviewCreat
 	messageData, err := r.reviewCreatedEventMarshaller.Marshal(
 		&ReviewCreatedEventMessage{
 			Review: ReviewMessage{
-				UUID:    event.Review.Uuid().String(),
-				Comment: event.Review.Comment(),
-				Rating:  event.Review.Rating(),
+				UUID:    event.UUID,
+				Comment: event.Comment,
+				Rating:  event.Rating,
 			},
 		},
 	)

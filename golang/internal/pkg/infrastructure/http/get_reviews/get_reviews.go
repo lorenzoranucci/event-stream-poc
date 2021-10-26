@@ -7,8 +7,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/ProntoPro/event-stream-golang/internal/pkg/domain"
-
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
 	http2 "github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/utils"
 )
@@ -67,13 +65,13 @@ func (h *GetReviewsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http2.Send(w, r, createResponse(reviews), http.StatusAccepted)
 }
 
-func createResponse(reviews []domain.Review) Response {
+func createResponse(reviews []application.Review) Response {
 	var res = make(Response, len(reviews))
 	for i, review := range reviews {
 		res[i] = ReviewResponse{
-			UUID:    review.Uuid().String(),
-			Comment: review.Comment(),
-			Rating:  review.Rating(),
+			UUID:    review.UUID,
+			Comment: review.Comment,
+			Rating:  review.Rating,
 		}
 	}
 

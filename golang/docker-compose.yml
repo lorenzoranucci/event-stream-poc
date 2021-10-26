@@ -3,11 +3,11 @@ version: '3.8'
 services:
   event-stream-golang:
     container_name: pp_event_stream_golang
-    image: golang:1.17.2
+    build: ./
     env_file:
       - ./.env
       - ./.env.dist
-    command: go run cmd/event-stream-golang/main.go server
+    entrypoint: /bin/event-stream-golang server
     working_dir: /srv
     volumes:
       - ./:/srv:cached
@@ -21,11 +21,11 @@ services:
 
   event-stream-golang-review-created-consumer:
     container_name: pp_event_stream_golang_review_created_consumer
-    image: golang:1.17.2
+    build: ./
     env_file:
       - ./.env
       - ./.env.dist
-    command: go run cmd/event-stream-golang/main.go consume-review-created
+    entrypoint: /bin/event-stream-golang consume-review-created
     working_dir: /srv
     volumes:
       - ./:/srv:cached
@@ -83,6 +83,17 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+
+  mariadb:
+    image: mariadb:10.6.4
+    restart: on-failure
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=reviews
+    networks:
+      ppro:
 
 volumes:
   zookeeper_data:

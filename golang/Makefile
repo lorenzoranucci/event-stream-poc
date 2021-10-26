@@ -154,8 +154,8 @@ docker-image: build-docker
 .PHONY: run-server run-consumer-update-tags run-consumer-update run-consumer-delete
 .PHONY: run-consumer-sorting-scores run-consumer-sorting-default-scores run-consumer-sorting-geo-clusters
 
-run-system:
-	@docker-compose down && docker-compose up -d
+run-system: build-docker
+	@docker-compose down --remove-orphans && docker-compose up -d --build
 
 post-review:
 	@curl -H "Content-Type: application/json" \

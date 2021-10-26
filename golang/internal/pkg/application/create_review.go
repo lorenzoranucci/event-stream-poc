@@ -27,7 +27,9 @@ type EventBus interface {
 }
 
 type ReviewCreatedEvent struct {
-	Review *domain.Review
+	UUID    string
+	Comment string
+	Rating  int32
 }
 
 func (h *CreateReviewCommandHandler) Execute(command CreateReviewCommand) error {
@@ -38,7 +40,13 @@ func (h *CreateReviewCommandHandler) Execute(command CreateReviewCommand) error 
 		return err
 	}
 
-	h.eventBus.DispatchEvent(ReviewCreatedEvent{Review: review})
+	h.eventBus.DispatchEvent(
+		ReviewCreatedEvent{
+			UUID:    review.Uuid().String(),
+			Comment: review.Comment(),
+			Rating:  review.Rating(),
+		},
+	)
 
 	return nil
 }

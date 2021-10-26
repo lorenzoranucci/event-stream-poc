@@ -24,6 +24,10 @@ func GetApp(version string) *cli.App {
 			EnvVar: "PULSAR_URL",
 		},
 		cli.StringFlag{
+			Name:   "mysql-url",
+			EnvVar: "MYSQL_URL",
+		},
+		cli.StringFlag{
 			Name:   "messaging-protocol",
 			EnvVar: "MESSAGING_PROTOCOL",
 		},
@@ -45,6 +49,7 @@ func newServiceLocatorFromCliContext(c *cli.Context) *serviceLocator {
 	return newServiceLocator(
 		c.String("kafka-url"),
 		c.String("pulsar-url"),
+		c.String("mysql-url"),
 		c.String("event-stream-type"),
 		c.String("messaging-protocol"),
 	)
