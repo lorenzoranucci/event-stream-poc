@@ -1,3 +1,4 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+merchant_review_create:
+   path: /merchant-reviews
+   methods: 'POST'
+   controller: App\MerchantRequest\Infrastructure\CreateMerchantRequestController
