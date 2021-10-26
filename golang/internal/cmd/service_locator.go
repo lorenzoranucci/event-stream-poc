@@ -8,7 +8,6 @@ import (
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/event_stream"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/create_review"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/get_reviews"
-	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/in_memory"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/mysql"
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/projectors"
 	"github.com/ProntoPro/event-stream-golang/pkg/kafka"
@@ -54,11 +53,10 @@ type serviceLocator struct {
 	jsonMarshaller     *event_stream.ReviewCreatedEventJSONMarshaller
 	protobufMarshaller *event_stream.ReviewCreatedEventProtobufMarshaller
 
-	inMemoryCreateReviewRepository *in_memory.CreateReviewRepository
-	inMemoryGetReviewsRepository   *in_memory.GetReviewsRepository
-
-	mysqlCreateReviewRepository *mysql.CreateReviewRepository
-	mysqlGetReviewsRepository   *mysql.GetReviewsRepository
+	mysqlCreateReviewRepository           *mysql.CreateReviewRepository
+	mysqlGetReviewsRepository             *mysql.GetReviewsRepository
+	mysqlIntegrationEventOutboxRepository *mysql.IntegrationReviewEventsOutboxRepository
+	mysqlTransactionManager               *mysql.TransactionManager
 
 	getReviewsProjector *projectors.GetReviewsProjector
 
@@ -77,20 +75,6 @@ type serviceLocator struct {
 	format          string
 }
 
-func (s *serviceLocator) MysqlCreateReviewRepository() *mysql.CreateReviewRepository {
-	if s.mysqlCreateReviewRepository == nil {
-		s.mysqlCreateReviewRepository = mysql.NewCreateReviewRepository(s.MysqlDB())
-	}
-	return s.mysqlCreateReviewRepository
-}
-
-func (s *serviceLocator) MysqlGetReviewsRepository() *mysql.GetReviewsRepository {
-	if s.mysqlGetReviewsRepository == nil {
-		s.mysqlGetReviewsRepository = mysql.NewGetReviewsRepository(s.MysqlDB())
-	}
-	return s.mysqlGetReviewsRepository
-}
-
 func (s *serviceLocator) GetReviewsProjector() *projectors.GetReviewsProjector {
 	if s.getReviewsProjector == nil {
 		s.getReviewsProjector = projectors.NewGetReviewsProjector(s.MysqlGetReviewsRepository())
@@ -100,7 +84,12 @@ func (s *serviceLocator) GetReviewsProjector() *projectors.GetReviewsProjector {
 
 func (s *serviceLocator) CreateReviewCommandHandler() *application.CreateReviewCommandHandler {
 	if s.createReviewCommandHandler == nil {
-		s.createReviewCommandHandler = application.NewCreateReviewCommandHandler(s.CreateReviewRepository(), s.EventBus())
+		s.createReviewCommandHandler = application.NewCreateReviewCommandHandler(
+			s.CreateReviewRepository(),
+			s.MysqlTransactionManager(),
+			s.MysqlIntegrationEventOutboxRepository(),
+			s.EventBus(),
+		)
 	}
 
 	return s.createReviewCommandHandler
@@ -122,7 +111,7 @@ func (s *serviceLocator) GetReviewsRepository() application.GetReviewsRepository
 	return s.MysqlGetReviewsRepository()
 }
 
-func (s *serviceLocator) EventBus() application.EventBus {
+func (s *serviceLocator) EventBus() application.IntegrationEventBus {
 	return s.ReviewCreatedEventProducer()
 }
 
@@ -181,20 +170,32 @@ func (s *serviceLocator) ReviewCreatedMarshaller() event_stream.ReviewCreatedEve
 	return s.reviewCreatedMarshaller
 }
 
-func (s *serviceLocator) InMemoryCreateReviewRepository() *in_memory.CreateReviewRepository {
-	if s.inMemoryCreateReviewRepository == nil {
-		s.inMemoryCreateReviewRepository = &in_memory.CreateReviewRepository{}
+func (s *serviceLocator) MysqlIntegrationEventOutboxRepository() *mysql.IntegrationReviewEventsOutboxRepository {
+	if s.mysqlIntegrationEventOutboxRepository == nil {
+		s.mysqlIntegrationEventOutboxRepository = mysql.NewIntegrationReviewEventsOutboxRepository(s.MysqlDB())
 	}
-
-	return s.inMemoryCreateReviewRepository
+	return s.mysqlIntegrationEventOutboxRepository
 }
 
-func (s *serviceLocator) InMemoryGetReviewsRepository() *in_memory.GetReviewsRepository {
-	if s.inMemoryGetReviewsRepository == nil {
-		s.inMemoryGetReviewsRepository = &in_memory.GetReviewsRepository{}
+func (s *serviceLocator) MysqlTransactionManager() *mysql.TransactionManager {
+	if s.mysqlTransactionManager == nil {
+		s.mysqlTransactionManager = mysql.NewTransactionManager(s.MysqlDB())
 	}
+	return s.mysqlTransactionManager
+}
 
-	return s.inMemoryGetReviewsRepository
+func (s *serviceLocator) MysqlCreateReviewRepository() *mysql.CreateReviewRepository {
+	if s.mysqlCreateReviewRepository == nil {
+		s.mysqlCreateReviewRepository = mysql.NewCreateReviewRepository(s.MysqlDB())
+	}
+	return s.mysqlCreateReviewRepository
+}
+
+func (s *serviceLocator) MysqlGetReviewsRepository() *mysql.GetReviewsRepository {
+	if s.mysqlGetReviewsRepository == nil {
+		s.mysqlGetReviewsRepository = mysql.NewGetReviewsRepository(s.MysqlDB())
+	}
+	return s.mysqlGetReviewsRepository
 }
 
 func (s *serviceLocator) ReviewCreatedEventProducer() *event_stream.ReviewCreatedEventProducer {

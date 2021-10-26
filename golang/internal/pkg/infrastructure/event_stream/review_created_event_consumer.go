@@ -45,9 +45,9 @@ func (r *ReviewCreatedEventConsumer) Consume() error {
 
 		err = r.projector.Project(
 			&application.ReviewCreatedEvent{
-				UUID:    eventMessage.Review.UUID,
-				Comment: eventMessage.Review.Comment,
-				Rating:  eventMessage.Review.Rating,
+				ReviewUUID: eventMessage.Review.UUID,
+				Comment:    eventMessage.Review.Comment,
+				Rating:     eventMessage.Review.Rating,
 			},
 		)
 		if err != nil {

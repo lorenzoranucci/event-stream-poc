@@ -24,4 +24,16 @@ func (m *Migrate) Migrate() {
     PRIMARY KEY (uuid)
 );`,
 	)
+
+	m.db.MustExec(`CREATE TABLE IF NOT EXISTS review_events_outbox (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    uuid VARCHAR(256) NOT NULL,
+    aggregate_id VARCHAR(256) NOT NULL,
+    name VARCHAR(256) NOT NULL,
+    payload TEXT NOT NULL,
+    version VARCHAR(256) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE (uuid)
+);`,
+	)
 }

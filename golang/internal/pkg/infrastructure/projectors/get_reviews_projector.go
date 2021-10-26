@@ -21,7 +21,7 @@ func (p *GetReviewsProjector) Project(review *application.ReviewCreatedEvent) er
 
 	return p.getReviewsRepository.AddOrUpdateByUUID(
 		&application.Review{
-			UUID:    review.UUID,
+			UUID:    review.ReviewUUID,
 			Comment: review.Comment,
 			Rating:  review.Rating,
 		},

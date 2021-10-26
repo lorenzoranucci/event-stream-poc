@@ -1,6 +1,8 @@
 package event_stream
 
 import (
+	"fmt"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
@@ -21,13 +23,18 @@ type ReviewCreatedEventProducer struct {
 	reviewCreatedEventMarshaller ReviewCreatedEventMarshaller
 }
 
-func (r *ReviewCreatedEventProducer) DispatchEvent(event application.ReviewCreatedEvent) {
+func (r *ReviewCreatedEventProducer) DispatchEvent(event application.IntegrationEvent) {
+	eventPayload, ok := event.Payload.(application.ReviewCreatedEvent)
+	if !ok {
+		r.handleErrors(fmt.Errorf("unsupported event payload"))
+	}
+
 	messageData, err := r.reviewCreatedEventMarshaller.Marshal(
 		&ReviewCreatedEventMessage{
 			Review: ReviewMessage{
-				UUID:    event.UUID,
-				Comment: event.Comment,
-				Rating:  event.Rating,
+				UUID:    eventPayload.ReviewUUID,
+				Comment: eventPayload.Comment,
+				Rating:  eventPayload.Rating,
 			},
 		},
 	)
@@ -36,9 +43,11 @@ func (r *ReviewCreatedEventProducer) DispatchEvent(event application.ReviewCreat
 		r.handleErrors(err)
 	}
 
+	// todo what happens if we fail before here...
 	err = r.producer.Dispatch(
 		messageData,
 	)
+	// todo what happens if we fail here...
 
 	if err != nil {
 		r.handleErrors(err)
