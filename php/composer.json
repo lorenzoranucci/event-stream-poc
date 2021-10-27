@@ -4,8 +4,9 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0",
         "ext-ctype": "*",
+        "ext-rdkafka": "*",
         "ext-iconv": "*",
         "symfony/console": "5.3.*",
         "symfony/dotenv": "5.3.*",

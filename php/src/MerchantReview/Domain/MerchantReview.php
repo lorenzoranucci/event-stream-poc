@@ -17,15 +17,11 @@ final class MerchantReview
 		string $comment,
 		int $rating,
     ): self {
-        $review = new self(
+        return new self(
             $uuid,
             $comment,
             $rating,
         );
-
-        MerchantReviewCreated::create($review);
-
-        return $review;
     }
 
     public function getUUID(): MerchantReviewUUID

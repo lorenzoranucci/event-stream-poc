@@ -30,7 +30,7 @@ final class CreateMerchantReviewCommandHandler
         $this->merchantReviewRepository->add($review);
 
         $this->eventBus->dispatch(
-            MerchantReviewCreated::create($review),
+
         );
     }
 }
