@@ -56,14 +56,15 @@ func (t *Transaction) Rollback() {
 func getTransaction(
 	transaction application.Transaction,
 	db *sqlx.DB,
-) (*sql.Tx, error) {
+) (*sql.Tx, bool, error) {
 	if shouldCreateNewTransaction(transaction) {
-		return db.Begin()
+		tx, err := db.Begin()
+		return tx, true, err
 	}
 
 	t := transaction.(*Transaction)
 
-	return t.Tx(), nil
+	return t.Tx(), false, nil
 }
 
 func shouldCreateNewTransaction(transaction application.Transaction) bool {

@@ -32,6 +32,7 @@ func (m *Migrate) Migrate() {
     name VARCHAR(256) NOT NULL,
     payload TEXT NOT NULL,
     version VARCHAR(256) NOT NULL,
+    status INT NOT NULL,
     PRIMARY KEY (id),
     UNIQUE (uuid)
 );`,

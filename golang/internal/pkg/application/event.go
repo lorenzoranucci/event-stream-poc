@@ -1,15 +1,23 @@
 package application
 
+type IntegrationEventStatus int
+
+const (
+	ToBeDispatched IntegrationEventStatus = iota
+	Dispatched
+)
+
 type IntegrationEvent struct {
 	UUID        string
 	AggregateID string
 	Name        string
 	Payload     interface{}
 	Version     string
+	Status      IntegrationEventStatus
 }
 
 type IntegrationEventOutboxRepository interface {
-	Add(event IntegrationEvent, transaction Transaction) error
+	Save(event IntegrationEvent, transaction Transaction) error
 }
 
 type IntegrationEventBus interface {

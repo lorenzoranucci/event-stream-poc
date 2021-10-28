@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/domain"
 )
@@ -83,10 +84,11 @@ func (h *CreateReviewCommandHandler) executeTransactionally(
 			Comment:    review.Comment(),
 			Rating:     review.Rating(),
 		},
+		Status:  ToBeDispatched,
 		Version: eventVersion,
 	}
 
-	err = h.eventOutboxRepository.Add(event, transaction)
+	err = h.eventOutboxRepository.Save(event, transaction)
 	if err != nil {
 		return nil, err
 	}
@@ -104,6 +106,14 @@ func (h *CreateReviewCommandHandler) executePostTransaction(events []Integration
 		h.eventBus.DispatchEvent(
 			event,
 		)
+
+		event.Status = Dispatched
+		// error is not handle here since it's acceptable to have the event dispatched again (at least once).
+		// The event may be dispatched again by a dedicated job.
+		err := h.eventOutboxRepository.Save(event, nil)
+		if err != nil {
+			logrus.Error(err)
+		}
 	}
 
 	return nil

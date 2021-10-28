@@ -1,7 +1,10 @@
 package mysql
 
 import (
+	"database/sql"
+
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
 
@@ -17,9 +20,18 @@ type CreateReviewRepository struct {
 }
 
 func (r *CreateReviewRepository) Add(review *domain.Review, transaction application.Transaction) error {
-	tx, err := getTransaction(transaction, r.db)
+	tx, shouldCommit, err := getTransaction(transaction, r.db)
 	if err != nil {
 		return err
+	}
+
+	if shouldCommit {
+		defer func(tx *sql.Tx) {
+			err := tx.Rollback()
+			if err != nil {
+				logrus.Error(err)
+			}
+		}(tx)
 	}
 
 	_, err = tx.Exec(
@@ -32,5 +44,8 @@ func (r *CreateReviewRepository) Add(review *domain.Review, transaction applicat
 		return err
 	}
 
+	if shouldCommit {
+		return tx.Commit()
+	}
 	return nil
 }
