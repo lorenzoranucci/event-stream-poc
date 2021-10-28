@@ -48,8 +48,6 @@ type ReviewCreatedEvent struct {
 }
 
 func (h *CreateReviewCommandHandler) Execute(command CreateReviewCommand) error {
-	review := domain.NewReview(command.Comment, command.Rating)
-
 	transaction, err := openTransaction(h.transactionManager)
 	if err != nil {
 		return err
@@ -57,9 +55,23 @@ func (h *CreateReviewCommandHandler) Execute(command CreateReviewCommand) error 
 
 	defer transaction.Rollback()
 
-	err = h.reviewRepository.Add(review, transaction)
+	events, err := h.executeTransactionally(command, transaction)
 	if err != nil {
 		return err
+	}
+
+	return h.executePostTransaction(events)
+}
+
+func (h *CreateReviewCommandHandler) executeTransactionally(
+	command CreateReviewCommand,
+	transaction Transaction,
+) ([]IntegrationEvent, error) {
+	review := domain.NewReview(command.Comment, command.Rating)
+
+	err := h.reviewRepository.Add(review, transaction)
+	if err != nil {
+		return nil, err
 	}
 
 	event := IntegrationEvent{
@@ -76,17 +88,23 @@ func (h *CreateReviewCommandHandler) Execute(command CreateReviewCommand) error 
 
 	err = h.eventOutboxRepository.Add(event, transaction)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = transaction.Commit()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	h.eventBus.DispatchEvent(
-		event,
-	)
+	return []IntegrationEvent{event}, nil
+}
+
+func (h *CreateReviewCommandHandler) executePostTransaction(events []IntegrationEvent) error {
+	for _, event := range events {
+		h.eventBus.DispatchEvent(
+			event,
+		)
+	}
 
 	return nil
 }
