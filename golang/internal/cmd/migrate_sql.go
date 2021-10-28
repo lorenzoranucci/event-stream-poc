@@ -33,8 +33,10 @@ func (m *Migrate) Migrate() {
     payload TEXT NOT NULL,
     version VARCHAR(256) NOT NULL,
     status INT NOT NULL,
+    message_counter_by_aggregate INT NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE (uuid)
+    UNIQUE (uuid),
+    UNIQUE (aggregate_id, message_counter_by_aggregate)
 );`,
 	)
 }

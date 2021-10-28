@@ -59,20 +59,28 @@ func (i *IntegrationReviewEventsOutboxRepository) Save(
 		}(tx)
 	}
 
+	lastMessageCounterByAggregate, err := selectLastMessageCounterByAggregate(event.AggregateID, i.db)
+	if err != nil {
+		return err
+	}
+
+	// this approach assumes that (aggregate_id, message_counter_by_aggregate) are unique and
+	// the Read Uncommitted isolation level is not used.
+	// In this way the counter will be perfectly consequential for each aggregate.
+	messageCounterByAggregate := lastMessageCounterByAggregate + 1
+
 	_, err = tx.Exec(
-		"INSERT INTO review_events_outbox (uuid, aggregate_id, name, payload, version, status) "+
-			"VALUES (?, ?, ?, ?, ?,?)"+
-			"ON DUPLICATE KEY UPDATE aggregate_id=?, name=?, payload=?, version=?, status=?",
+		"INSERT INTO review_events_outbox "+
+			"(uuid, aggregate_id, name, payload, version, status, message_counter_by_aggregate) "+
+			"VALUES (?, ?, ?, ?, ?, ?, ?) "+
+			"ON DUPLICATE KEY UPDATE status=?",
 		event.UUID,
 		event.AggregateID,
 		event.Name,
 		payload,
 		event.Version,
 		int(event.Status),
-		event.AggregateID,
-		event.Name,
-		payload,
-		event.Version,
+		messageCounterByAggregate,
 		int(event.Status),
 	)
 	if err != nil {
@@ -84,4 +92,30 @@ func (i *IntegrationReviewEventsOutboxRepository) Save(
 	}
 
 	return nil
+}
+
+func selectLastMessageCounterByAggregate(aggregateId string, db *sqlx.DB) (int32, error) {
+	rows, err := db.Query(
+		`SELECT MAX(message_counter_by_aggregate)
+			FROM review_events_outbox 
+			WHERE aggregate_id = ?`,
+		aggregateId,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	rows.Next()
+	var lastMessageCounterByAggregateId sql.NullInt32
+	err = rows.Scan(&lastMessageCounterByAggregateId)
+	if err != nil {
+		return 0, err
+	}
+
+	var result int32
+	if lastMessageCounterByAggregateId.Valid {
+		result = lastMessageCounterByAggregateId.Int32
+	}
+
+	return result, err
 }
