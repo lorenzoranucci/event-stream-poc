@@ -2,10 +2,11 @@ package commands
 
 import (
 	"github.com/ProntoPro/event-stream-golang/internal/pkg/domain"
+	"github.com/google/uuid"
 )
 
 func NewCreateReviewCommandHandler(
-	reviewRepository domain.ReviewRepository,
+	reviewRepository ReviewRepository,
 ) *CreateReviewCommandHandler {
 	return &CreateReviewCommandHandler{
 		reviewRepository: reviewRepository,
@@ -13,7 +14,7 @@ func NewCreateReviewCommandHandler(
 }
 
 type CreateReviewCommandHandler struct {
-	reviewRepository domain.ReviewRepository
+	reviewRepository ReviewRepository
 	eventRepository  EventRepository
 	transactionFactory TransactionFactory
 }
@@ -23,6 +24,11 @@ type CreateReviewCommand struct {
 	Rating  int32
 }
 
+type ReviewRepository interface {
+	SaveTransactional(transaction Transaction, review *domain.Review) error
+	FindByUUID(reviewUUID uuid.UUID) (*domain.Review, error)
+}
+
 type ReviewCreatedEvent struct {
 	ReviewUUID string
 	Comment    string
@@ -30,7 +36,7 @@ type ReviewCreatedEvent struct {
 }
 
 type EventRepository interface {
-	Save(name string, payload interface{}) error
+	SaveTransactional(transaction Transaction, name string, payload interface{}) error
 }
 
 type Transaction interface {
@@ -45,12 +51,23 @@ type TransactionFactory interface {
 func (h *CreateReviewCommandHandler) Execute(command CreateReviewCommand) error {
 	review := domain.NewReview(command.Comment, command.Rating)
 
-	err := h.reviewRepository.Save(review)
+	transaction, err := h.transactionFactory.Create()
 	if err != nil {
 		return err
 	}
 
-	err = h.eventRepository.Save(
+	err = transaction.Begin()
+	if err != nil {
+		return err
+	}
+
+	err = h.reviewRepository.SaveTransactional(transaction, review)
+	if err != nil {
+		return err
+	}
+
+	err = h.eventRepository.SaveTransactional(
+		transaction,
 		"review_created",
 		ReviewCreatedEvent{
 			ReviewUUID: review.Uuid().String(),
@@ -58,6 +75,11 @@ func (h *CreateReviewCommandHandler) Execute(command CreateReviewCommand) error 
 			Rating:     review.Rating(),
 		},
 	)
+
+	err = transaction.Commit()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
