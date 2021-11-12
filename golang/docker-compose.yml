@@ -19,21 +19,21 @@ services:
     networks:
       ppro:
 
-  event-stream-golang-review-created-consumer:
-    container_name: pp_event_stream_golang_review_created_consumer
-    build: ./
-    env_file:
-      - ./.env
-      - ./.env.dist
-    entrypoint: /bin/event-stream-golang consume-review-created
-    working_dir: /srv
-    volumes:
-      - ./:/srv:cached
-    deploy:
-      restart_policy:
-        condition: on-failure
-    networks:
-      ppro:
+#  event-stream-golang-review-created-consumer:
+#    container_name: pp_event_stream_golang_review_created_consumer
+#    build: ./
+#    env_file:
+#      - ./.env
+#      - ./.env.dist
+#    entrypoint: /bin/event-stream-golang consume-review-created
+#    working_dir: /srv
+#    volumes:
+#      - ./:/srv:cached
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#    networks:
+#      ppro:
 
   zookeeper:
     image: docker.io/bitnami/zookeeper:3.7
@@ -48,6 +48,7 @@ services:
         condition: on-failure
     networks:
       ppro:
+
   kafka:
     image: docker.io/bitnami/kafka:3
     ports:
@@ -64,25 +65,6 @@ services:
         condition: on-failure
     networks:
       ppro:
-
-  pulsar:
-    image: apachepulsar/pulsar:2.8.1
-    ports:
-      - "8081:8081"
-      - "6650:6650"
-    environment:
-      - BOOKIE_MEM=" -Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g"
-    command: >
-      /bin/bash -c
-      "bin/apply-config-from-env.py /conf/pulsar.conf
-      && exec bin/pulsar standalone --advertised-address pulsar"
-    volumes:
-      - ./conf:/conf:cached
-    networks:
-      ppro:
-    deploy:
-      restart_policy:
-        condition: on-failure
 
   mariadb:
     image: mariadb:10.6.4
