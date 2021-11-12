@@ -14,6 +14,7 @@ func NewCreateReviewCommandHandler(
 
 type CreateReviewCommandHandler struct {
 	reviewRepository domain.ReviewRepository
+	eventRepository  EventRepository
 }
 
 type CreateReviewCommand struct {
@@ -27,8 +28,26 @@ type ReviewCreatedEvent struct {
 	Rating     int32
 }
 
+type EventRepository interface {
+	Save(name string, payload interface{}) error
+}
+
 func (h *CreateReviewCommandHandler) Execute(command CreateReviewCommand) error {
 	review := domain.NewReview(command.Comment, command.Rating)
 
-	return h.reviewRepository.Save(review)
+	err := h.reviewRepository.Save(review)
+	if err != nil {
+		return err
+	}
+
+	err = h.eventRepository.Save(
+		"review_created",
+		ReviewCreatedEvent{
+			ReviewUUID: review.Uuid().String(),
+			Comment:    review.Comment(),
+			Rating:     review.Rating(),
+		},
+	)
+
+	return nil
 }
