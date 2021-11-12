@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli"
 )
 
@@ -15,7 +13,7 @@ func consumeReviewCreatedEvent(baseFlags []cli.Flag) cli.Command {
 }
 
 func consumeReviewCreated(c *cli.Context) error {
-	serviceLocator := newServiceLocatorFromCliContext(c)
+	/*serviceLocator := newServiceLocatorFromCliContext(c)
 
 	migrate := Migrate{db: serviceLocator.MysqlDB()}
 	migrate.Migrate()
@@ -25,7 +23,7 @@ func consumeReviewCreated(c *cli.Context) error {
 	err := consumer.Consume()
 	if err != nil {
 		fmt.Println(err)
-	}
+	}*/
 
 	return nil
 }

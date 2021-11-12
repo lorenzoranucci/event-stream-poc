@@ -41,3 +41,8 @@ func (r *Review) Rating() int32 {
 func (r *Review) IncrementRating() {
 	r.rating++
 }
+
+type ReviewRepository interface {
+	Save(review *Review) error
+	FindByUUID(reviewUUID uuid.UUID) (*Review, error)
+}
