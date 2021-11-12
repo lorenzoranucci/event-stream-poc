@@ -1,4 +1,4 @@
-package application
+package commands
 
 import (
 	"github.com/google/uuid"
@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	eventVersion = "0.1.0"
-	eventName    = "review_created_event"
+	reviewCreatedEventVersion = "0.1.0"
+	reviewCreatedEventName    = "review_created"
 )
 
 func NewCreateReviewCommandHandler(
-	reviewRepository CreateReviewRepository,
+	reviewRepository ReviewRepository,
 	transactionManager TransactionManager,
 	eventOutboxRepository IntegrationEventOutboxRepository,
 	eventBus IntegrationEventBus,
@@ -27,7 +27,7 @@ func NewCreateReviewCommandHandler(
 }
 
 type CreateReviewCommandHandler struct {
-	reviewRepository      CreateReviewRepository
+	reviewRepository      ReviewRepository
 	transactionManager    TransactionManager
 	eventOutboxRepository IntegrationEventOutboxRepository
 	eventBus              IntegrationEventBus
@@ -36,10 +36,6 @@ type CreateReviewCommandHandler struct {
 type CreateReviewCommand struct {
 	Comment string
 	Rating  int32
-}
-
-type CreateReviewRepository interface {
-	Add(review *domain.Review, transaction Transaction) error
 }
 
 type ReviewCreatedEvent struct {
@@ -70,7 +66,7 @@ func (h *CreateReviewCommandHandler) executeTransactionally(
 ) ([]IntegrationEvent, error) {
 	review := domain.NewReview(command.Comment, command.Rating)
 
-	err := h.reviewRepository.Add(review, transaction)
+	err := h.reviewRepository.Save(review, transaction)
 	if err != nil {
 		return nil, err
 	}
@@ -78,14 +74,14 @@ func (h *CreateReviewCommandHandler) executeTransactionally(
 	event := IntegrationEvent{
 		UUID:        uuid.New().String(),
 		AggregateID: review.Uuid().String(),
-		Name:        eventName,
+		Name:        reviewCreatedEventName,
 		Payload: ReviewCreatedEvent{
 			ReviewUUID: review.Uuid().String(),
 			Comment:    review.Comment(),
 			Rating:     review.Rating(),
 		},
 		Status:  ToBeDispatched,
-		Version: eventVersion,
+		Version: reviewCreatedEventVersion,
 	}
 
 	err = h.eventOutboxRepository.Save(event, transaction)

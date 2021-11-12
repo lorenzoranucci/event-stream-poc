@@ -1,15 +1,16 @@
-package event_stream
+package review_created
 
 import (
 	"fmt"
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/application/commands"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/event_stream"
 )
 
 func NewReviewCreatedEventProducer(
-	producer Producer,
+	producer event_stream.Producer,
 	reviewCreatedEventMarshaller ReviewCreatedEventMarshaller,
 ) *ReviewCreatedEventProducer {
 	return &ReviewCreatedEventProducer{
@@ -19,12 +20,12 @@ func NewReviewCreatedEventProducer(
 }
 
 type ReviewCreatedEventProducer struct {
-	producer                     Producer
+	producer                     event_stream.Producer
 	reviewCreatedEventMarshaller ReviewCreatedEventMarshaller
 }
 
-func (r *ReviewCreatedEventProducer) DispatchEvent(event application.IntegrationEvent) {
-	eventPayload, ok := event.Payload.(application.ReviewCreatedEvent)
+func (r *ReviewCreatedEventProducer) DispatchEvent(event commands.IntegrationEvent) {
+	eventPayload, ok := event.Payload.(commands.ReviewCreatedEvent)
 	if !ok {
 		r.handleErrors(fmt.Errorf("unsupported event payload"))
 	}

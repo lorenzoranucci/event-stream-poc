@@ -7,16 +7,16 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/application/queries"
 	http2 "github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/utils"
 )
 
 type GetReviewsHandler struct {
-	qh *application.GetReviewsQueryHandler
+	qh *queries.GetReviewsQueryHandler
 }
 
 func NewGetReviewsHandler(
-	getReviewsQueryHandler *application.GetReviewsQueryHandler,
+	getReviewsQueryHandler *queries.GetReviewsQueryHandler,
 ) *GetReviewsHandler {
 	return &GetReviewsHandler{
 		qh: getReviewsQueryHandler,
@@ -52,7 +52,7 @@ func (h *GetReviewsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	reviews, err := h.qh.Execute(
-		application.GetReviewsQuery{
+		queries.GetReviewsQuery{
 			Limit:  int32(limit),
 			Offset: int64(offset),
 		},
@@ -65,7 +65,7 @@ func (h *GetReviewsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http2.Send(w, r, createResponse(reviews), http.StatusAccepted)
 }
 
-func createResponse(reviews []application.Review) Response {
+func createResponse(reviews []queries.Review) Response {
 	var res = make(Response, len(reviews))
 	for i, review := range reviews {
 		res[i] = ReviewResponse{

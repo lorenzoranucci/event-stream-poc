@@ -1,4 +1,4 @@
-package event_stream
+package review_created
 
 type ReviewCreatedEventMessage struct {
 	Review ReviewMessage `json:"review"`

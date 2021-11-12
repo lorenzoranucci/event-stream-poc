@@ -12,6 +12,14 @@ func NewReview(comment string, rating int32) *Review {
 	}
 }
 
+func CreateFromRepository(uuid uuid.UUID, comment string, rating int32) *Review {
+	return &Review{
+		uuid:    uuid,
+		comment: comment,
+		rating:  rating,
+	}
+}
+
 type Review struct {
 	uuid    uuid.UUID
 	comment string
@@ -28,4 +36,8 @@ func (r *Review) Comment() string {
 
 func (r *Review) Rating() int32 {
 	return r.rating
+}
+
+func (r *Review) IncrementRating() {
+	r.rating++
 }

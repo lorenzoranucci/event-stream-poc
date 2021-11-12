@@ -8,7 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 
-	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/application/commands"
 )
 
 type IntegrationReviewEventsOutboxRepository struct {
@@ -26,10 +26,10 @@ type Payload struct {
 }
 
 func (i *IntegrationReviewEventsOutboxRepository) Save(
-	event application.IntegrationEvent,
-	transaction application.Transaction,
+	event commands.IntegrationEvent,
+	transaction commands.Transaction,
 ) error {
-	eventPayload, ok := event.Payload.(application.ReviewCreatedEvent)
+	eventPayload, ok := event.Payload.(commands.ReviewCreatedEvent)
 	if !ok {
 		return fmt.Errorf("unsupported event payload")
 	}

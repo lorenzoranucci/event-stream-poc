@@ -1,10 +1,10 @@
-package application
+package queries
 
 type GetReviewsQueryHandler struct {
-	reviewRepository GetReviewsRepository
+	reviewRepository ReviewRepository
 }
 
-func NewGetReviewsQueryHandler(reviewRepository GetReviewsRepository) *GetReviewsQueryHandler {
+func NewGetReviewsQueryHandler(reviewRepository ReviewRepository) *GetReviewsQueryHandler {
 	return &GetReviewsQueryHandler{reviewRepository: reviewRepository}
 }
 
@@ -19,7 +19,7 @@ type Review struct {
 	Rating  int32
 }
 
-type GetReviewsRepository interface {
+type ReviewRepository interface {
 	Find(query GetReviewsQuery) ([]Review, error)
 }
 

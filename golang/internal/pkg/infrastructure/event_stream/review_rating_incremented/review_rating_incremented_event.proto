@@ -1,0 +1,10 @@
+syntax = "proto3";
+option go_package = "internal/pkg/infrastructure/event_stream/review_rating_incremented";
+
+message ReviewRatingIncrementedEvent {
+    message Review {
+        string uuid = 1;
+    }
+
+    Review review = 1;
+}

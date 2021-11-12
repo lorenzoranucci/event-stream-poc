@@ -15,7 +15,7 @@ endif
 # Helpers
 
 # $1: image
-# $2: command
+# $2: queries
 define run-docker
 	@docker run --rm --network local_default \
 		-e GOOS=linux \
@@ -165,6 +165,11 @@ post-review:
 get-reviews:
 	@curl -H "Content-Type: application/json" \
      -X GET http://localhost:8080/reviews?limit=50&offset=0
+
+patch-review:
+	@curl -H "Content-Type: application/json" \
+     -X PATCH http://localhost:8080/reviews/$(UUID) \
+     -d '{}'
 
 log-consumer:
 	@docker logs -f pp_event_stream_golang_review_created_consumer

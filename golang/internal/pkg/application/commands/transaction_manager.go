@@ -1,4 +1,4 @@
-package application
+package commands
 
 type TransactionManager interface {
 	Create() (Transaction, error)

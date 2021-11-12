@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.26.0
 // 	protoc        v3.6.1
-// source: internal/pkg/infrastructure/event_stream/review_created_event.proto
+// source: internal/pkg/infrastructure/event_stream/review_rating_incremented_event.proto
 
-package event_stream
+package review_created
 
 import (
 	reflect "reflect"

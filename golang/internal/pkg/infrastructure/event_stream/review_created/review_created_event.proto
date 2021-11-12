@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "internal/pkg/infrastructure/event_stream";
+option go_package = "internal/pkg/infrastructure/event_stream/review_created";
 
 message ReviewCreatedEvent {
     message Review {

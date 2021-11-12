@@ -7,16 +7,17 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/application/commands"
+
 	http2 "github.com/ProntoPro/event-stream-golang/internal/pkg/infrastructure/http/utils"
 )
 
 type CreateReviewHandler struct {
-	ch *application.CreateReviewCommandHandler
+	ch *commands.CreateReviewCommandHandler
 }
 
 func NewCreateReviewHandler(
-	createReviewCommandHandler *application.CreateReviewCommandHandler,
+	createReviewCommandHandler *commands.CreateReviewCommandHandler,
 ) *CreateReviewHandler {
 	return &CreateReviewHandler{
 		ch: createReviewCommandHandler,
@@ -43,7 +44,7 @@ func (h *CreateReviewHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	}
 
 	err = h.ch.Execute(
-		application.CreateReviewCommand{
+		commands.CreateReviewCommand{
 			Comment: request.Comment,
 			Rating:  request.Rating,
 		},

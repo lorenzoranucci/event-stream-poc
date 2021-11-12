@@ -33,6 +33,7 @@ func runServer(c *cli.Context) error {
 		c.Int("port"),
 		serviceLocator.CreateReviewHandler(),
 		serviceLocator.GetReviewsHandler(),
+		serviceLocator.PatchReviewHandler(),
 	)
 
 	server.Run()

@@ -6,7 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/ProntoPro/event-stream-golang/internal/pkg/application"
+	"github.com/ProntoPro/event-stream-golang/internal/pkg/application/commands"
 )
 
 type TransactionManager struct {
@@ -17,7 +17,7 @@ func NewTransactionManager(db *sqlx.DB) *TransactionManager {
 	return &TransactionManager{db: db}
 }
 
-func (t *TransactionManager) Create() (application.Transaction, error) {
+func (t *TransactionManager) Create() (commands.Transaction, error) {
 	return &Transaction{db: t.db}, nil
 }
 
@@ -54,7 +54,7 @@ func (t *Transaction) Rollback() {
 }
 
 func getTransaction(
-	transaction application.Transaction,
+	transaction commands.Transaction,
 	db *sqlx.DB,
 ) (*sql.Tx, bool, error) {
 	if shouldCreateNewTransaction(transaction) {
@@ -67,7 +67,7 @@ func getTransaction(
 	return t.Tx(), false, nil
 }
 
-func shouldCreateNewTransaction(transaction application.Transaction) bool {
+func shouldCreateNewTransaction(transaction commands.Transaction) bool {
 	if transaction == nil {
 		return true
 	}
