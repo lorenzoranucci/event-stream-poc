@@ -15,6 +15,7 @@ func NewCreateReviewCommandHandler(
 type CreateReviewCommandHandler struct {
 	reviewRepository domain.ReviewRepository
 	eventRepository  EventRepository
+	transactionFactory TransactionFactory
 }
 
 type CreateReviewCommand struct {
@@ -30,6 +31,15 @@ type ReviewCreatedEvent struct {
 
 type EventRepository interface {
 	Save(name string, payload interface{}) error
+}
+
+type Transaction interface {
+	Begin() error
+	Commit() error
+}
+
+type TransactionFactory interface {
+	Create() (Transaction, error)
 }
 
 func (h *CreateReviewCommandHandler) Execute(command CreateReviewCommand) error {
